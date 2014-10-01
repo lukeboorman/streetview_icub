@@ -28,51 +28,6 @@ IMG_SUFFIX = ".jpg"
 #args = parser.parse_args()
 dir_name="img_data"
 
-# Determine if a point is inside a given polygon or not
-# Polygon is a list of (x,y) pairs.
-# http://www.ariel.com.au/a/python-point-int-poly.html
-#def point_inside_polygon(x, y, poly):
-#    n = len(poly)
-#    inside = False
-#    p1x, p1y = poly[0]
-#    for i in range(n+1):
-#        p2x, p2y = poly[i % n]
-#        if y > min(p1y, p2y):
-#            if y <= max(p1y, p2y):
-#                if x <= max(p1x, p2x):
-#                    if p1y != p2y:
-#                        xinters = (y-p1y)*(p2x-p1x)/(p2y-p1y)+p1x
-#                    if p1x == p2x or x <= xinters:
-#                        inside = not inside
-#        p1x, p1y = p2x, p2y
-#    return inside
-
-#print "Loading borders"
-#shape_file = "D:/VVV14/TM_WORLD_BORDERS/TM_WORLD_BORDERS-0.3.shp"
-#if not os.path.exists(shape_file):
-#    print "Cannot find " + shape_file + ". Please download it from "
-#    "http://thematicmapping.org/downloads/world_borders.php and try again."
-#    sys.exit()
-
-#==============================================================================
-# sf = shapefile.Reader(shape_file)
-# shapes = sf.shapes()
-#==============================================================================
-
-#==============================================================================
-# print "Finding country"
-# for i, record in enumerate(sf.records()):
-#     if record[2] == dir_name.upper():
-#         print record[2], record[4]
-#         print shapes[i].bbox
-#         min_lon = shapes[i].bbox[0]
-#         min_lat = shapes[i].bbox[1]
-#         max_lon = shapes[i].bbox[2]
-#         max_lat = shapes[i].bbox[3]
-#         borders = shapes[i].points
-#         break
-# 
-#==============================================================================
 
 print "Getting images"
 attempts, country_hits, imagery_hits, imagery_misses, imagery_sucess = 0, 0, 0, 0, 0
@@ -110,10 +65,13 @@ step_lon=diff_lon/approx_num_steps
 
 step_array=range(IMAGES_WANTED)
 steps_lon_all=(step_array*step_lon)+start_lon
-steps_lat_all=(step_array*step_lat)+start_lat   
+steps_lat_all=(step_array*step_lat)+start_lat
 print "Longtitudes:", steps_lon_all
 print "Latitudes:", steps_lat_all
 
+# Define these for saving sucessful lon and lats
+steps_lon_success=[]
+steps_lat_success=[]
 
 try:
     while(True):
@@ -146,6 +104,8 @@ try:
             urllib.urlretrieve(url, outfile)
         except:
             pass
+            print " WARNING Failed to get google image:" + ",ID" + str(imagery_sucess) + "," + str(heading) + "," + str(pitch) + "," + str(fov) + lat_lon
+
         if os.path.isfile(outfile):
             # Check size and delete "Sorry, we have no imagery here".
             # Note: hardcoded based on current size of default.
@@ -179,6 +139,10 @@ try:
                             urllib.urlretrieve(url, outfile)
                         except:
                             pass
+                            print " WARNING Failed to get google image:" + ",ID" + str(imagery_sucess) + "," + str(current_heading) + "," + str(pitch) + "," + str(fov) + lat_lon
+                    steps_lat_success.append(round(steps_lat_all[imagery_hits],6))
+                    steps_lon_success.append(round(steps_lon_all[imagery_hits],6))
+                    
                     imagery_sucess += 1
                 imagery_hits += 1                
                 if imagery_hits == IMAGES_WANTED:
@@ -189,8 +153,14 @@ except KeyboardInterrupt:
     print "Keyboard interrupt"
 
 print "Attempts:\t", attempts
-print "Country hits:\t", country_hits
+#print "Country hits:\t", country_hits
 print "Imagery misses:\t", imagery_misses
 print "Imagery hits:\t", imagery_hits
+
+print "Imagery Success:\t", imagery_sucess
+print "Successful Longtitudes:", steps_lon_success
+print "Successful Latitudes:", steps_lat_success
+
+
 
 # End of file
