@@ -175,21 +175,25 @@ while True:
 #        break
     elif k == ord('w'): # w=forwards
         #image = image[::-1]
-        new_location_x +=direction_vector[0]        
+        new_location_x +=direction_vector[0]
+        new_location_y +=direction_vector[1]
         resized_img, image_found,new_heading_ind,direction_vector,image_title=find_next_set_images(new_location_x,new_location_y,new_heading_ind,file_database_sorted,piclist)
         if image_found==0:
             print "No image"
             new_location_x -=direction_vector[0]
+            new_location_y -=direction_vector[1]
         else:
             cv2.putText(resized_img, image_title, (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, 0);
             cv2.imshow(window_name, resized_img)
     elif k == ord('s'): # s= backwards
         #image = image[::-1]
         new_location_x -=direction_vector[0]
+        new_location_y -=direction_vector[1]
         resized_img, image_found,new_heading_ind,direction_vector,image_title=find_next_set_images(new_location_x,new_location_y,new_heading_ind,file_database_sorted,piclist)
         if image_found==0:
             print "No image"
             new_location_x +=direction_vector[0]
+            new_location_y +=direction_vector[1]
         else:
             cv2.putText(resized_img, image_title, (20,20), cv2.FONT_HERSHEY_SIMPLEX, 0.4, 0);
             cv2.imshow(window_name, resized_img)
